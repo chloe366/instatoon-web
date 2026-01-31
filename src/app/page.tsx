@@ -11,65 +11,133 @@ interface Cut {
   loading?: boolean;
 }
 
+// 캐릭터 타입 정의
+const CHARACTER_TYPES = {
+  human_male: {
+    name: '👨 남자 직장인',
+    description: 'young Korean male office worker in his 30s, short black hair, wearing glasses, navy blue suit, friendly face',
+  },
+  human_female: {
+    name: '👩 여자 직장인',
+    description: 'young Korean female office worker in her 30s, shoulder-length black hair, wearing white blouse and gray cardigan, warm smile',
+  },
+  cat: {
+    name: '🐱 고양이',
+    description: 'cute orange tabby cat character with big expressive eyes, standing upright like human, wearing tiny office clothes',
+  },
+  dog: {
+    name: '🐶 강아지',
+    description: 'adorable golden retriever puppy character with big eyes, standing upright like human, wearing tiny business casual clothes',
+  },
+  bear: {
+    name: '🐻 곰돌이',
+    description: 'cute brown bear character with round face and small ears, standing upright, wearing cozy sweater',
+  },
+  rabbit: {
+    name: '🐰 토끼',
+    description: 'cute white rabbit character with long ears and pink nose, standing upright, wearing casual clothes',
+  },
+};
+
+// 아트 스타일 정의
+const ART_STYLES = {
+  webtoon: {
+    name: '📱 웹툰 스타일',
+    description: 'Korean webtoon style, clean line art, soft cel shading, pastel colors, manhwa illustration',
+  },
+  cute: {
+    name: '🎀 귀여운 스타일',
+    description: 'kawaii cute chibi style, big head small body, adorable expressions, soft pastel colors',
+  },
+  minimal: {
+    name: '✨ 미니멀 스타일',
+    description: 'minimalist flat illustration, simple shapes, limited color palette, clean design',
+  },
+  cartoon: {
+    name: '🎨 카툰 스타일',
+    description: 'western cartoon style, bold outlines, vibrant colors, expressive characters',
+  },
+};
+
 export default function Home() {
   const [topic, setTopic] = useState('');
   const [problem, setProblem] = useState('');
   const [solution, setSolution] = useState('');
+  const [characterType, setCharacterType] = useState<keyof typeof CHARACTER_TYPES>('human_female');
+  const [artStyle, setArtStyle] = useState<keyof typeof ART_STYLES>('webtoon');
   const [cuts, setCuts] = useState<Cut[]>([]);
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [seed, setSeed] = useState<number>(0);
+
+  // 일관된 캐릭터를 위한 시드 생성
+  const generateSeed = () => {
+    return Math.floor(Math.random() * 1000000);
+  };
+
+  const getCharacterPrompt = () => {
+    const char = CHARACTER_TYPES[characterType];
+    const style = ART_STYLES[artStyle];
+    return `${char.description}, ${style.description}`;
+  };
 
   const generateStoryboard = () => {
     if (!topic) return;
+
+    // 새로운 스토리보드 생성 시 시드 고정
+    const newSeed = generateSeed();
+    setSeed(newSeed);
+
+    const characterBase = getCharacterPrompt();
 
     const storyboard: Cut[] = [
       {
         id: 1,
         title: '문제 인식',
         text: problem || `${topic}... 어떻게 해야 할지 모르겠다`,
-        prompt: 'Korean person looking confused and uncertain, question marks floating around, pastel colors, simple cartoon illustration style, square format',
+        prompt: `${characterBase}, looking confused and uncertain with tilted head, question marks floating around, hand on chin thinking pose, soft background, square format`,
       },
       {
         id: 2,
         title: '포기 상태',
         text: '모르겠다... 나중에 하지',
-        prompt: 'Korean person sitting with arms crossed, giving up expression, gray muted colors, simple cartoon illustration, square format',
+        prompt: `${characterBase}, sitting with arms crossed, disappointed giving up expression, slouching posture, gray muted background colors, thought bubble above head, square format`,
       },
       {
         id: 3,
         title: '경고',
         text: "그 '나중에'가 벌써 몇 년째...",
-        prompt: 'Warning sign illustration, red triangle with exclamation mark, calendar pages flying, red and gray colors, simple cartoon style, square format',
+        prompt: `${characterBase}, shocked expression looking at calendar showing years passing by, sweat drop, red warning colors in background, dramatic lighting, square format`,
       },
       {
         id: 4,
         title: '전환점',
         text: solution || `${topic}, 사실 간단해요!`,
-        prompt: 'Korean person with excited aha moment expression, bright warm colors, lightbulb above head, simple cartoon style, square format',
+        prompt: `${characterBase}, excited aha moment expression with sparkling eyes, holding up one finger, bright lightbulb above head, warm happy colors, energetic pose, square format`,
       },
       {
         id: 5,
         title: '핵심 정보',
         text: '핵심만 알면 끝!',
-        prompt: 'Simple infographic illustration, clean minimal design, pastel colors, icons and charts, square format',
+        prompt: `${characterBase}, confident smile pointing at floating infographic icons and charts, teaching pose, clean organized background, professional mood, square format`,
       },
       {
         id: 6,
         title: '결론',
         text: '고민 끝! 지금 바로 시작하세요',
-        prompt: 'Big green checkmark icon, thumbs up gesture, bright pastel green colors, simple cartoon illustration, square format',
+        prompt: `${characterBase}, thumbs up with big confident smile, green checkmark floating nearby, bright positive energy, success mood, warm lighting, square format`,
       },
       {
         id: 7,
         title: '실천 방법',
         text: 'Step 1. 첫 번째 단계',
-        prompt: 'Mobile app screenshot mockup, clean UI design, step by step guide, simple illustration style, square format',
+        prompt: `${characterBase}, holding smartphone showing app interface, focused expression, step by step guide visual, clean UI elements floating around, square format`,
       },
       {
         id: 8,
         title: '마무리',
         text: '오늘 바로 시작하세요!',
-        prompt: 'Confident Korean person with proud smile, warm golden lighting, success mood, celebration confetti, simple cartoon illustration, square format',
+        prompt: `${characterBase}, celebrating with both arms raised, super happy expression, confetti and sparkles around, warm golden lighting, victory pose, encouraging mood, square format`,
       },
     ];
 
@@ -78,7 +146,8 @@ export default function Home() {
 
   const generateImage = async (prompt: string): Promise<string> => {
     const encodedPrompt = encodeURIComponent(prompt);
-    const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1080&height=1080&nologo=true`;
+    // seed를 사용하여 일관된 캐릭터 생성
+    const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1080&height=1080&nologo=true&seed=${seed}`;
     return url;
   };
 
@@ -152,11 +221,70 @@ export default function Home() {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
             🎨 인스타툰 생성기
           </h1>
-          <p className="text-gray-600 mt-1">AI로 인스타툰을 자동 생성하세요!</p>
+          <p className="text-gray-600 mt-1">AI로 웹툰 스타일 인스타툰을 자동 생성하세요!</p>
         </div>
       </header>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Style Selection Section */}
+        <section className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4">🎭 캐릭터 & 스타일 선택</h2>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Character Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                캐릭터 타입
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {Object.entries(CHARACTER_TYPES).map(([key, value]) => (
+                  <button
+                    key={key}
+                    onClick={() => setCharacterType(key as keyof typeof CHARACTER_TYPES)}
+                    className={`p-3 rounded-xl border-2 transition-all text-sm ${
+                      characterType === key
+                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    {value.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Art Style */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                아트 스타일
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {Object.entries(ART_STYLES).map(([key, value]) => (
+                  <button
+                    key={key}
+                    onClick={() => setArtStyle(key as keyof typeof ART_STYLES)}
+                    className={`p-3 rounded-xl border-2 transition-all text-sm ${
+                      artStyle === key
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    {value.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Preview */}
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+            <p className="text-sm text-gray-600">
+              <span className="font-semibold">선택된 스타일:</span>{' '}
+              {CHARACTER_TYPES[characterType].name} + {ART_STYLES[artStyle].name}
+            </p>
+          </div>
+        </section>
+
         {/* Input Section */}
         <section className="bg-white rounded-2xl shadow-lg p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">📝 주제 입력</h2>
@@ -214,7 +342,10 @@ export default function Home() {
         {cuts.length > 0 && (
           <section className="bg-white rounded-2xl shadow-lg p-6 mb-8">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">🖼️ 스토리보드</h2>
+              <div>
+                <h2 className="text-xl font-semibold">🖼️ 스토리보드</h2>
+                <p className="text-sm text-gray-500">시드: {seed} (캐릭터 일관성 유지)</p>
+              </div>
               <div className="space-x-2">
                 <button
                   onClick={handleGenerate}
@@ -301,7 +432,7 @@ export default function Home() {
 저장 📌 하고 나중에 다시 보세요!
 
 ─────────────────
-#꿀팁 #정보공유 #인스타툰 #일상툰
+#꿀팁 #정보공유 #인스타툰 #웹툰
 #자기계발 #습관 #동기부여 #성장`}
               className="w-full h-48 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
             />

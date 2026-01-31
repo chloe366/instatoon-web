@@ -13,6 +13,11 @@ interface Cut {
   error?: boolean;
 }
 
+interface GeneratedContent {
+  dialogues: string[];
+  tips?: string[];
+}
+
 // 툰 종류 정의
 const TOON_TYPES = {
   info: {
@@ -21,23 +26,13 @@ const TOON_TYPES = {
     color: 'blue',
     template: [
       { phase: 'hook', emotion: 'curious', title: '궁금증' },
-      { phase: 'problem', emotion: 'frustrated', title: '어려움' },
-      { phase: 'struggle', emotion: 'confused', title: '방황' },
-      { phase: 'discovery', emotion: 'surprised', title: '발견' },
-      { phase: 'solution', emotion: 'excited', title: '해결책' },
-      { phase: 'action', emotion: 'determined', title: '실천' },
-      { phase: 'result', emotion: 'happy', title: '성과' },
+      { phase: 'problem', emotion: 'frustrated', title: '문제' },
+      { phase: 'tip1', emotion: 'surprised', title: '핵심팁 1' },
+      { phase: 'tip2', emotion: 'excited', title: '핵심팁 2' },
+      { phase: 'tip3', emotion: 'determined', title: '핵심팁 3' },
+      { phase: 'action', emotion: 'focused', title: '실천법' },
+      { phase: 'result', emotion: 'happy', title: '효과' },
       { phase: 'ending', emotion: 'satisfied', title: 'CTA' },
-    ],
-    generateDialogues: (topic: string, problem: string, solution: string) => [
-      { text: `${topic}... 이거 어떻게 하는 거지?` },
-      { text: problem || `${topic}이 너무 어려워...` },
-      { text: `검색해도 다 어려운 말뿐이야` },
-      { text: `앗! 이렇게 하면 되는 거였어?` },
-      { text: solution || `알고 보니 ${topic}은 간단했어!` },
-      { text: `바로 해볼게! 생각보다 쉽네?` },
-      { text: `와! 진작 알았으면 좋았을 텐데~` },
-      { text: `저장해두고 나중에 꼭 해보세요!` },
     ],
     hashtags: ['꿀팁', '정보공유', '알면좋은것', '생활꿀팁'],
   },
@@ -53,17 +48,7 @@ const TOON_TYPES = {
       { phase: 'turn', emotion: 'thinking', title: '전환' },
       { phase: 'accept', emotion: 'calm', title: '수용' },
       { phase: 'resolve', emotion: 'hopeful', title: '다짐' },
-      { phase: 'ending', emotion: 'warm', title: '마무리' },
-    ],
-    generateDialogues: (topic: string, problem: string, solution: string) => [
-      { text: `오늘도 ${topic}...` },
-      { text: problem || `왜 이렇게 힘들지...` },
-      { text: `나만 이런 건가...?` },
-      { text: `진짜 지친다...` },
-      { text: `잠깐, 다들 이렇게 느끼는 거 아닐까?` },
-      { text: solution || `괜찮아, 이것도 지나가겠지` },
-      { text: `내일은 조금 더 나아질 거야` },
-      { text: `오늘도 수고했어, 우리 💕` },
+      { phase: 'ending', emotion: 'warm', title: '위로' },
     ],
     hashtags: ['공감', '위로', '일상', '마음', '힐링'],
   },
@@ -72,24 +57,14 @@ const TOON_TYPES = {
     description: '소소한 일상을 재미있게 풀어낸 이야기',
     color: 'green',
     template: [
-      { phase: 'morning', emotion: 'sleepy', title: '아침' },
+      { phase: 'morning', emotion: 'sleepy', title: '시작' },
       { phase: 'event', emotion: 'surprised', title: '사건' },
       { phase: 'reaction', emotion: 'shocked', title: '반응' },
       { phase: 'chaos', emotion: 'panicked', title: '혼란' },
       { phase: 'attempt', emotion: 'determined', title: '시도' },
       { phase: 'fail', emotion: 'embarrassed', title: '실패' },
       { phase: 'accept', emotion: 'laughing', title: '받아들임' },
-      { phase: 'ending', emotion: 'happy', title: '그래도 괜찮아' },
-    ],
-    generateDialogues: (topic: string, problem: string, solution: string) => [
-      { text: `평화로운 하루의 시작~` },
-      { text: `엥? ${topic}이 갑자기...?!` },
-      { text: problem || `이게 뭔 일이야?!` },
-      { text: `어떡해 어떡해 어떡해!` },
-      { text: `일단 해보자!` },
-      { text: `...역시 안 되는구나 ㅋㅋㅋ` },
-      { text: solution || `에라 모르겠다 ㅋㅋㅋ` },
-      { text: `이것도 추억이지 뭐~ 😂` },
+      { phase: 'ending', emotion: 'happy', title: '마무리' },
     ],
     hashtags: ['일상툰', '일상', '웃긴일상', 'daily', '소소한일상'],
   },
@@ -107,16 +82,6 @@ const TOON_TYPES = {
       { phase: 'cons', emotion: 'thinking', title: '아쉬운점' },
       { phase: 'verdict', emotion: 'confident', title: '총평' },
     ],
-    generateDialogues: (topic: string, problem: string, solution: string) => [
-      { text: `${topic} 드디어 샀다!` },
-      { text: `두근두근... 배송 왔다!` },
-      { text: `개봉기 시작~` },
-      { text: problem || `오... 첫인상은 이렇네?` },
-      { text: `실제로 써보니까...` },
-      { text: solution || `이건 진짜 좋다!` },
-      { text: `근데 이건 좀 아쉽네` },
-      { text: `결론: 추천해요! ⭐⭐⭐⭐` },
-    ],
     hashtags: ['리뷰', '후기', '솔직리뷰', '추천', '언박싱'],
   },
   challenge: {
@@ -133,16 +98,6 @@ const TOON_TYPES = {
       { phase: 'after', emotion: 'proud', title: '변화' },
       { phase: 'ending', emotion: 'glowing', title: '결과' },
     ],
-    generateDialogues: (topic: string, problem: string, solution: string) => [
-      { text: problem || `이대로는 안 되겠어...` },
-      { text: `${topic} 시작한다!` },
-      { text: `첫날! 할 수 있어!` },
-      { text: `힘들다... 왜 시작했지...` },
-      { text: `그만둘까...?` },
-      { text: `아니야! 여기서 포기 못해!` },
-      { text: solution || `와... 나 진짜 해냈어!` },
-      { text: `도전은 배신하지 않는다 🔥` },
-    ],
     hashtags: ['챌린지', '도전', '변화', '성장', '갓생'],
   },
   cooking: {
@@ -158,16 +113,6 @@ const TOON_TYPES = {
       { phase: 'cooking', emotion: 'anticipating', title: '조리' },
       { phase: 'done', emotion: 'proud', title: '완성' },
       { phase: 'taste', emotion: 'delighted', title: '시식' },
-    ],
-    generateDialogues: (topic: string, problem: string, solution: string) => [
-      { text: `오늘의 메뉴: ${topic}!` },
-      { text: `재료 준비 완료~` },
-      { text: problem || `먼저 이렇게 준비해요` },
-      { text: `다음은 이렇게!` },
-      { text: `거의 다 됐어요~` },
-      { text: `맛있는 냄새가...` },
-      { text: solution || `완성! 예쁘게 담아볼게요` },
-      { text: `대성공! 꼭 해보세요 🍽️` },
     ],
     hashtags: ['레시피', '요리', '집밥', '자취요리', '간단요리'],
   },
@@ -209,6 +154,10 @@ const CHARACTER_TYPES = {
 
 // 아트 스타일 정의
 const ART_STYLES = {
+  handdrawn: {
+    name: '✏️ 손그림',
+    description: 'cute hand-drawn sketch style with pencil texture, simple doodle art, warm and friendly feel, soft lines, notebook paper aesthetic',
+  },
   webtoon: {
     name: '📱 웹툰',
     description: 'Korean webtoon manhwa style clean line art soft pastel colors',
@@ -257,6 +206,8 @@ const EMOTIONS: { [key: string]: string } = {
   focused: 'focused concentrated serious working',
   careful: 'careful attentive precise gentle hands',
   delighted: 'delighted overjoyed ecstatic happy tears',
+  confident: 'confident assured self-assured proud stance',
+  exhausted: 'exhausted worn out sweating tired but pushing through',
 };
 
 // 예시 갤러리 데이터
@@ -264,7 +215,7 @@ const EXAMPLE_GALLERY = [
   { topic: '연금저축 ETF', toonType: 'info', image: '💡💰' },
   { topic: '월요병', toonType: 'empathy', image: '🥹😴' },
   { topic: '출근길 해프닝', toonType: 'daily', image: '📅🚇' },
-  { topic: '다이어트 챌린지', toonType: 'challenge', image: '🔥💪' },
+  { topic: '다이어트 30일', toonType: 'challenge', image: '🔥💪' },
 ];
 
 export default function Home() {
@@ -274,9 +225,10 @@ export default function Home() {
   const [problem, setProblem] = useState('');
   const [solution, setSolution] = useState('');
   const [characterType, setCharacterType] = useState<keyof typeof CHARACTER_TYPES>('bear');
-  const [artStyle, setArtStyle] = useState<keyof typeof ART_STYLES>('webtoon');
+  const [artStyle, setArtStyle] = useState<keyof typeof ART_STYLES>('handdrawn');
   const [cuts, setCuts] = useState<Cut[]>([]);
   const [generating, setGenerating] = useState(false);
+  const [generatingContent, setGeneratingContent] = useState(false);
   const [progress, setProgress] = useState(0);
   const [seed, setSeed] = useState<number>(0);
   const [showHero, setShowHero] = useState(true);
@@ -288,33 +240,418 @@ export default function Home() {
 
   const generateSeed = () => Math.floor(Math.random() * 999999);
 
-  const generateStoryboard = () => {
+  // AI를 사용해 정보성 콘텐츠 생성
+  const generateInfoContent = async (topic: string): Promise<GeneratedContent> => {
+    const prompt = `You are a Korean content creator. Create an informative Instagram toon script about "${topic}".
+
+Return ONLY a JSON object (no markdown, no explanation) with this exact format:
+{
+  "dialogues": [
+    "궁금증을 유발하는 첫 문장 (15자 이내)",
+    "많은 사람들이 겪는 문제점 (20자 이내)",
+    "핵심 팁 1: 구체적인 정보 (25자 이내)",
+    "핵심 팁 2: 실용적인 조언 (25자 이내)",
+    "핵심 팁 3: 꿀팁 또는 주의사항 (25자 이내)",
+    "바로 실천할 수 있는 방법 (20자 이내)",
+    "이렇게 하면 얻는 효과 (20자 이내)",
+    "저장을 유도하는 마무리 (15자 이내)"
+  ]
+}
+
+Requirements:
+- All text must be in Korean
+- Include specific numbers, percentages, or facts when possible
+- Make it practical and actionable
+- Keep each line short for speech bubbles`;
+
+    try {
+      const response = await fetch(
+        `https://text.pollinations.ai/${encodeURIComponent(prompt)}`,
+        {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+        }
+      );
+      const text = await response.text();
+
+      // JSON 추출 시도
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        if (parsed.dialogues && parsed.dialogues.length === 8) {
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.error('AI content generation failed:', error);
+    }
+
+    // 폴백: 기본 템플릿
+    return {
+      dialogues: [
+        `${topic}... 이거 어떻게 하는 거지?`,
+        `${topic} 시작이 막막해...`,
+        `첫째, 기초부터 차근차근!`,
+        `둘째, 꾸준히 하는 게 핵심!`,
+        `셋째, 전문가 조언을 참고하세요`,
+        `오늘부터 바로 시작해보자!`,
+        `3개월 후면 달라진 내가 될 거야`,
+        `저장하고 나중에 꼭 해보세요! 📌`,
+      ],
+    };
+  };
+
+  // AI를 사용해 공감 콘텐츠 생성
+  const generateEmpathyContent = async (topic: string): Promise<GeneratedContent> => {
+    const prompt = `You are a Korean emotional content creator. Create a deeply touching and relatable Instagram toon script about "${topic}".
+
+Return ONLY a JSON object (no markdown, no explanation) with this exact format:
+{
+  "dialogues": [
+    "상황을 설명하는 담담한 문장 (15자 이내)",
+    "힘든 감정을 표현 (15자 이내)",
+    "혼자만 그런 것 같은 외로움 (15자 이내)",
+    "감정의 절정, 가장 힘든 순간 (15자 이내)",
+    "작은 깨달음의 순간 (20자 이내)",
+    "스스로를 다독이는 말 (20자 이내)",
+    "희망적인 다짐 (20자 이내)",
+    "따뜻한 위로와 응원의 메시지 (25자 이내)"
+  ]
+}
+
+Requirements:
+- All text in Korean
+- Be genuine and emotionally resonant
+- The last message should be warm and comforting
+- Use gentle, understanding tone
+- Make readers feel understood and less alone`;
+
+    try {
+      const response = await fetch(
+        `https://text.pollinations.ai/${encodeURIComponent(prompt)}`,
+        {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+        }
+      );
+      const text = await response.text();
+
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        if (parsed.dialogues && parsed.dialogues.length === 8) {
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.error('AI content generation failed:', error);
+    }
+
+    return {
+      dialogues: [
+        `오늘도 ${topic}...`,
+        `왜 이렇게 힘들지...`,
+        `나만 이런 걸까...?`,
+        `정말 지친다...`,
+        `다들 이렇게 느끼는 거 아닐까?`,
+        `괜찮아, 잘하고 있어`,
+        `내일은 조금 더 나아질 거야`,
+        `오늘 하루도 정말 수고했어요 💕`,
+      ],
+    };
+  };
+
+  // AI를 사용해 일상 콘텐츠 생성
+  const generateDailyContent = async (topic: string): Promise<GeneratedContent> => {
+    const prompt = `You are a Korean webtoon creator. Create a funny daily life Instagram toon script about "${topic}".
+
+Return ONLY a JSON object (no markdown, no explanation) with this exact format:
+{
+  "dialogues": [
+    "평화로운 시작 (10자 이내)",
+    "갑자기 벌어진 사건 (15자 이내)",
+    "놀란 반응 (10자 이내)",
+    "당황하는 모습 (12자 이내)",
+    "해결하려는 시도 (12자 이내)",
+    "실패하는 모습 (12자 이내)",
+    "받아들이는 모습 (15자 이내)",
+    "긍정적 마무리 (15자 이내)"
+  ]
+}
+
+Requirements:
+- All text in Korean
+- Be humorous and relatable
+- Use casual, conversational tone
+- Include some ㅋㅋㅋ or emoticons naturally`;
+
+    try {
+      const response = await fetch(
+        `https://text.pollinations.ai/${encodeURIComponent(prompt)}`,
+        {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+        }
+      );
+      const text = await response.text();
+
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        if (parsed.dialogues && parsed.dialogues.length === 8) {
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.error('AI content generation failed:', error);
+    }
+
+    return {
+      dialogues: [
+        `평화로운 하루~`,
+        `엥?! ${topic}이?!`,
+        `이게 뭔 일이야?!`,
+        `어떡해 어떡해!`,
+        `일단 해보자!`,
+        `...역시 안 되네 ㅋㅋ`,
+        `에라 모르겠다~`,
+        `이것도 추억이지 뭐 😂`,
+      ],
+    };
+  };
+
+  // AI를 사용해 리뷰 콘텐츠 생성
+  const generateReviewContent = async (topic: string): Promise<GeneratedContent> => {
+    const prompt = `You are a Korean product reviewer. Create an honest review Instagram toon script about "${topic}".
+
+Return ONLY a JSON object (no markdown, no explanation) with this exact format:
+{
+  "dialogues": [
+    "제품을 발견한 순간 (12자 이내)",
+    "구매 결정 (12자 이내)",
+    "개봉하는 설렘 (12자 이내)",
+    "첫인상 (15자 이내)",
+    "실제 사용 후기 (20자 이내)",
+    "가장 좋았던 장점 (20자 이내)",
+    "아쉬운 점 (15자 이내)",
+    "최종 평가와 추천 (15자 이내)"
+  ]
+}
+
+Requirements:
+- All text in Korean
+- Be honest and balanced
+- Include specific details about the product
+- End with a clear recommendation`;
+
+    try {
+      const response = await fetch(
+        `https://text.pollinations.ai/${encodeURIComponent(prompt)}`,
+        {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+        }
+      );
+      const text = await response.text();
+
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        if (parsed.dialogues && parsed.dialogues.length === 8) {
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.error('AI content generation failed:', error);
+    }
+
+    return {
+      dialogues: [
+        `${topic} 드디어 샀다!`,
+        `고민 끝에 결제!`,
+        `두근두근 개봉기~`,
+        `오... 첫인상 좋은데?`,
+        `실제로 써보니까 만족!`,
+        `이 부분이 진짜 좋아요`,
+        `이건 좀 아쉽네요`,
+        `결론: 추천해요! ⭐⭐⭐⭐`,
+      ],
+    };
+  };
+
+  // AI를 사용해 챌린지 콘텐츠 생성
+  const generateChallengeContent = async (topic: string): Promise<GeneratedContent> => {
+    const prompt = `You are a Korean fitness/lifestyle content creator. Create a motivating challenge Instagram toon script about "${topic}".
+
+Return ONLY a JSON object (no markdown, no explanation) with this exact format:
+{
+  "dialogues": [
+    "시작 전 상태 (12자 이내)",
+    "결심하는 순간 (12자 이내)",
+    "첫날의 각오 (12자 이내)",
+    "중간의 고비 (15자 이내)",
+    "포기하고 싶은 순간 (15자 이내)",
+    "다시 마음 다잡기 (15자 이내)",
+    "변화가 보이는 순간 (15자 이내)",
+    "성공 후 메시지 (20자 이내)"
+  ]
+}
+
+Requirements:
+- All text in Korean
+- Be motivating and inspiring
+- Show real struggle and triumph
+- End with encouragement for others`;
+
+    try {
+      const response = await fetch(
+        `https://text.pollinations.ai/${encodeURIComponent(prompt)}`,
+        {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+        }
+      );
+      const text = await response.text();
+
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        if (parsed.dialogues && parsed.dialogues.length === 8) {
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.error('AI content generation failed:', error);
+    }
+
+    return {
+      dialogues: [
+        `이대로는 안 돼...`,
+        `${topic} 시작한다!`,
+        `첫날! 할 수 있어!`,
+        `힘들다... 왜 시작했지`,
+        `그만둘까...?`,
+        `아니야! 포기 못해!`,
+        `와... 진짜 달라졌어!`,
+        `도전은 배신하지 않아요 🔥`,
+      ],
+    };
+  };
+
+  // AI를 사용해 레시피 콘텐츠 생성
+  const generateCookingContent = async (topic: string): Promise<GeneratedContent> => {
+    const prompt = `You are a Korean cooking content creator. Create a simple recipe Instagram toon script for "${topic}".
+
+Return ONLY a JSON object (no markdown, no explanation) with this exact format:
+{
+  "dialogues": [
+    "오늘의 메뉴 소개 (12자 이내)",
+    "필요한 재료 (20자 이내, 구체적으로)",
+    "첫 번째 단계 (20자 이내, 구체적 조리법)",
+    "두 번째 단계 (20자 이내, 구체적 조리법)",
+    "세 번째 단계 (20자 이내, 구체적 조리법)",
+    "마무리 조리 (15자 이내)",
+    "완성된 모습 (12자 이내)",
+    "맛 평가 (15자 이내)"
+  ]
+}
+
+Requirements:
+- All text in Korean
+- Include specific ingredients and amounts
+- Give clear, actionable cooking steps
+- Make it sound delicious`;
+
+    try {
+      const response = await fetch(
+        `https://text.pollinations.ai/${encodeURIComponent(prompt)}`,
+        {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+        }
+      );
+      const text = await response.text();
+
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        if (parsed.dialogues && parsed.dialogues.length === 8) {
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.error('AI content generation failed:', error);
+    }
+
+    return {
+      dialogues: [
+        `오늘의 메뉴: ${topic}!`,
+        `재료: 기본 재료들 준비~`,
+        `먼저 재료를 손질해요`,
+        `팬에 볶아주세요`,
+        `양념을 넣고 섞어요`,
+        `불 조절하며 마무리~`,
+        `완성! 예쁘게 담기`,
+        `대성공! 맛있어요 🍽️`,
+      ],
+    };
+  };
+
+  // 콘텐츠 생성 함수 선택
+  const generateContent = async (type: keyof typeof TOON_TYPES, topic: string): Promise<GeneratedContent> => {
+    switch (type) {
+      case 'info':
+        return generateInfoContent(topic);
+      case 'empathy':
+        return generateEmpathyContent(topic);
+      case 'daily':
+        return generateDailyContent(topic);
+      case 'review':
+        return generateReviewContent(topic);
+      case 'challenge':
+        return generateChallengeContent(topic);
+      case 'cooking':
+        return generateCookingContent(topic);
+      default:
+        return generateInfoContent(topic);
+    }
+  };
+
+  const generateStoryboard = async () => {
     if (!topic) return;
 
+    setGeneratingContent(true);
     const newSeed = generateSeed();
     setSeed(newSeed);
 
-    const toon = TOON_TYPES[toonType];
-    const char = CHARACTER_TYPES[characterType];
-    const style = ART_STYLES[artStyle];
+    try {
+      // AI로 콘텐츠 생성
+      const content = await generateContent(toonType, topic);
 
-    const dialogues = toon.generateDialogues(topic, problem, solution);
+      const toon = TOON_TYPES[toonType];
+      const char = CHARACTER_TYPES[characterType];
+      const style = ART_STYLES[artStyle];
 
-    const storyboard: Cut[] = toon.template.map((template, index) => {
-      const dialogue = dialogues[index];
-      const emotion = EMOTIONS[template.emotion] || EMOTIONS.happy;
+      const storyboard: Cut[] = toon.template.map((template, index) => {
+        const dialogue = content.dialogues[index] || `${topic} 이야기`;
+        const emotion = EMOTIONS[template.emotion] || EMOTIONS.happy;
 
-      return {
-        id: index + 1,
-        title: template.title,
-        dialogue: dialogue.text,
-        emotion: template.emotion,
-        prompt: `${char.description}, ${emotion}, comic panel with white speech bubble containing Korean text, ${style.description}, single character, clean background, webtoon panel style, square format 1:1 ratio, high quality illustration`,
-      };
-    });
+        return {
+          id: index + 1,
+          title: template.title,
+          dialogue: dialogue,
+          emotion: template.emotion,
+          prompt: `${char.description}, ${emotion}, comic panel with white speech bubble containing Korean text, ${style.description}, single character, clean background, webtoon panel style, square format 1:1 ratio, high quality illustration`,
+        };
+      });
 
-    setCuts(storyboard);
-    setShowHero(false);
+      setCuts(storyboard);
+      setShowHero(false);
+    } catch (error) {
+      console.error('Failed to generate storyboard:', error);
+    } finally {
+      setGeneratingContent(false);
+    }
   };
 
   const generateImage = async (prompt: string, cutIndex: number): Promise<string> => {
@@ -490,16 +827,19 @@ export default function Home() {
                 아이디어를 웹툰으로
               </span>
             </h2>
-            <p className={`text-lg md:text-xl mb-8 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              그림 실력 없이도 AI가 8컷 인스타툰을 만들어드려요
+            <p className={`text-lg md:text-xl mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              AI가 주제를 분석해 알찬 정보와 감동적인 스토리를 만들어드려요
+            </p>
+            <p className={`text-sm mb-8 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+              ✨ NEW: AI가 주제에 맞는 실제 정보와 팁을 자동 생성합니다
             </p>
 
             {/* 3-Step Workflow */}
             <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto mb-12">
               {[
                 { icon: '✍️', title: '주제 입력', desc: '주제와 툰 종류 선택' },
-                { icon: '🎨', title: 'AI 생성', desc: '8컷 스토리보드 자동 생성' },
-                { icon: '📱', title: '업로드', desc: '인스타그램에 바로 공유' },
+                { icon: '🤖', title: 'AI 분석', desc: '정보 검색 & 스토리 생성' },
+                { icon: '🎨', title: '이미지 생성', desc: '8컷 웹툰 완성' },
               ].map((item, i) => (
                 <div key={i} className="relative">
                   <div className={`${cardClass} rounded-2xl p-4 hover:scale-105 transition-transform`}>
@@ -676,6 +1016,9 @@ export default function Home() {
             <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
               <span className={`w-8 h-8 rounded-lg bg-gradient-to-br ${getTypeColor(selectedToon.color)} flex items-center justify-center text-white text-sm`}>3</span>
               스토리 설정
+              <span className={`text-xs px-2 py-1 rounded-full ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-500'}`}>
+                🤖 AI가 정보를 검색해 채워드려요
+              </span>
             </h2>
 
             <div className="space-y-4">
@@ -688,12 +1031,12 @@ export default function Home() {
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                   placeholder={
-                    toonType === 'info' ? '예: 연금저축 ETF, 세금 절약 방법...' :
-                    toonType === 'empathy' ? '예: 월요병, 야근, 눈치...' :
-                    toonType === 'daily' ? '예: 출근길, 점심시간, 퇴근...' :
-                    toonType === 'review' ? '예: 에어팟, 맥북, 화장품...' :
-                    toonType === 'challenge' ? '예: 다이어트, 금연, 공부...' :
-                    toonType === 'cooking' ? '예: 계란찜, 볶음밥, 파스타...' :
+                    toonType === 'info' ? '예: 연금저축 ETF, 세금 절약 방법, 비타민 효능...' :
+                    toonType === 'empathy' ? '예: 월요병, 야근, 눈치, 번아웃...' :
+                    toonType === 'daily' ? '예: 출근길, 점심시간, 퇴근, 주말...' :
+                    toonType === 'review' ? '예: 에어팟, 맥북, 화장품, 앱...' :
+                    toonType === 'challenge' ? '예: 다이어트 30일, 금연, 미라클모닝...' :
+                    toonType === 'cooking' ? '예: 계란찜, 김치볶음밥, 파스타...' :
                     '예: 주제를 입력하세요...'
                   }
                   className={`w-full px-4 py-3 rounded-xl transition focus:ring-2 focus:ring-violet-500 focus:outline-none ${
@@ -702,64 +1045,26 @@ export default function Home() {
                       : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400'
                   } border`}
                 />
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    {toonType === 'empathy' ? '😢 힘든 점' :
-                     toonType === 'challenge' ? '😰 시작 전 상태' :
-                     toonType === 'review' ? '🤔 구매 이유' :
-                     '😰 고민/문제'} (선택)
-                  </label>
-                  <textarea
-                    value={problem}
-                    onChange={(e) => setProblem(e.target.value)}
-                    placeholder={
-                      toonType === 'empathy' ? '힘들었던 상황...' :
-                      toonType === 'challenge' ? '변화 전 상태...' :
-                      toonType === 'review' ? '왜 사게 되었는지...' :
-                      '주인공이 겪는 어려움...'
-                    }
-                    className={`w-full px-4 py-3 rounded-xl transition focus:ring-2 focus:ring-violet-500 focus:outline-none h-20 resize-none ${
-                      darkMode
-                        ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
-                        : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400'
-                    } border`}
-                  />
-                </div>
-                <div>
-                  <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    {toonType === 'empathy' ? '💕 위로의 말' :
-                     toonType === 'challenge' ? '🎉 변화 후 상태' :
-                     toonType === 'review' ? '⭐ 사용 후기' :
-                     '💡 해결책'} (선택)
-                  </label>
-                  <textarea
-                    value={solution}
-                    onChange={(e) => setSolution(e.target.value)}
-                    placeholder={
-                      toonType === 'empathy' ? '스스로에게 하고 싶은 말...' :
-                      toonType === 'challenge' ? '달성한 결과...' :
-                      toonType === 'review' ? '좋았던 점...' :
-                      '어떻게 해결했는지...'
-                    }
-                    className={`w-full px-4 py-3 rounded-xl transition focus:ring-2 focus:ring-violet-500 focus:outline-none h-20 resize-none ${
-                      darkMode
-                        ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
-                        : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400'
-                    } border`}
-                  />
-                </div>
+                <p className={`text-xs mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                  💡 구체적인 주제일수록 더 정확한 정보가 생성됩니다
+                </p>
               </div>
 
               <button
                 onClick={generateStoryboard}
-                disabled={!topic}
+                disabled={!topic || generatingContent}
                 className={`w-full relative py-4 rounded-xl font-bold text-white overflow-hidden transition-all hover:scale-[1.02] hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 group`}
               >
                 <div className={`absolute inset-0 bg-gradient-to-r ${getTypeColor(selectedToon.color)}`} />
-                <span className="relative">✨ 스토리보드 생성</span>
+                <span className="relative flex items-center justify-center gap-2">
+                  {generatingContent ? (
+                    <>
+                      <span className="animate-spin">🤖</span> AI가 정보를 분석하고 있어요...
+                    </>
+                  ) : (
+                    <>✨ AI로 스토리보드 생성</>
+                  )}
+                </span>
               </button>
             </div>
           </section>
@@ -892,8 +1197,7 @@ export default function Home() {
 
 ${CHARACTER_TYPES[characterType].nameKr}의 ${topic} 이야기
 
-${problem ? `"${problem}"` : ''}
-${solution ? `➡️ "${solution}"` : ''}
+${cuts.slice(2, 5).map(c => `✅ ${c.dialogue}`).join('\n')}
 
 ${toonType === 'empathy' ? '오늘도 수고했어요 💕' :
   toonType === 'challenge' ? '여러분도 도전해보세요! 🔥' :
@@ -904,7 +1208,7 @@ ${toonType === 'empathy' ? '오늘도 수고했어요 💕' :
 ─────────────────
 #인스타툰 #${selectedToon.name.replace(/[^\w가-힣]/g, '')} #${topic.replace(/\s/g, '')}
 ${selectedToon.hashtags.map(tag => `#${tag}`).join(' ')}`}
-                className={`w-full h-56 px-4 py-3 rounded-xl text-sm resize-none ${
+                className={`w-full h-64 px-4 py-3 rounded-xl text-sm resize-none ${
                   darkMode
                     ? 'bg-gray-800 border-gray-700 text-gray-300'
                     : 'bg-gray-50 border-gray-200 text-gray-700'
@@ -919,10 +1223,7 @@ ${selectedToon.hashtags.map(tag => `#${tag}`).join(' ')}`}
       <footer className={`border-t mt-8 py-6 ${darkMode ? 'border-gray-800 bg-gray-950/50' : 'border-gray-200 bg-white/30'}`}>
         <div className="max-w-6xl mx-auto px-4 text-center">
           <div className={`text-sm ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-            Made with ❤️ by AI | Snow White Storyboard Method
-          </div>
-          <div className={`text-xs mt-1 ${darkMode ? 'text-gray-600' : 'text-gray-300'}`}>
-            Powered by Pollinations.ai
+            Made with ❤️ by AI | Powered by Pollinations.ai
           </div>
         </div>
       </footer>
